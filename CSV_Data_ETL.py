@@ -22,7 +22,7 @@ def create_sample_data(filename = 'finance_data.csv', num_records = 1000):
     df.to_csv(filename, index=False)
     print("Sample data created in", filename)
 
-def process_finance_data(input_file = "finance_data.csv", output_file = "processed_finance_data.csv"):
+def process_monthly_totals(input_file = "finance_data.csv", output_file = "processed_monthly_totals.csv"):
 
     print("Extracting data...")
     df = pd.read_csv(input_file)
@@ -45,14 +45,40 @@ def process_finance_data(input_file = "finance_data.csv", output_file = "process
 
     print("Processed data saved to", output_file)
 
+    return monthly_stats
 
+def process_average_by_transaction_type(input_file = "finance_data.csv", output_file = "processed_average_by_type.csv"):
 
+    print("Extracting data...")
+    df = pd.read_csv(input_file)
 
+    print("Transforming data...")
+
+    #df['date'] = pd.to_datetime(df['date'])
+
+    #df['month_year'] = df['date'].dt.strftime('%m-%Y')
+    
+    transaction_average = df.groupby(['type']).agg({
+        'amount': 'mean'
+    }).reset_index()
+
+    transaction_average.columns = ["Transaction Type", "Average Amount"]
+
+    print("Loading processed data...")
+
+    transaction_average.to_csv(output_file, index=False)
+
+    print("Processed data saved to", output_file)
+        
 if __name__ == "__main__":
     
     create_sample_data()
 
-    process_finance_data()
+    process_monthly_totals()
+
+    process_average_by_transaction_type()
+
+
 
 
 
