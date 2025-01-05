@@ -69,7 +69,35 @@ def process_average_by_transaction_type(input_file = "finance_data.csv", output_
     transaction_average.to_csv(output_file, index=False)
 
     print("Processed data saved to", output_file)
+
+def process_start_end_bal (start_balance, input_file = "finance_data.csv", output_file = "processed_start_end_bal.csv"):
+    print("Extracting data...")
+
+    df = pd.read_csv(input_file)
+
+    print("Transforming data...")
+
+    balance = start_balance
+
+    for index, row in df.iterrows():
+        if row['type'] == "Deposit" or row['type'] == "Interest":
+            balance += row['amount']
+        elif row['type'] == "Withdrawal" or row ['type'] == "Purchase":
+            balance -= row['amount']
+    
+    output_bal = {"Starting balance:": start_balance, "Ending balance:": balance}
+
+    output_df = pd.DataFrame([output_bal])
+
+    print("Loading processed data...")
+
+    output_df.to_csv(output_file, index=False)
+
+    print("Processed data saved to", output_file)
+
+    print(output_df.to_string(index=False))
         
+
 if __name__ == "__main__":
     
     create_sample_data()
@@ -77,6 +105,8 @@ if __name__ == "__main__":
     process_monthly_totals()
 
     process_average_by_transaction_type()
+
+    process_start_end_bal(0)
 
 
 
