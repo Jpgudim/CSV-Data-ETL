@@ -14,6 +14,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+finance_db = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = os.getenv("mysql_password"),
+    database = "finance_db"
+)
+
+mycursor = finance_db.cursor()
+
 def create_sample_data(filename = 'finance_data.csv', num_records = 1000):
 
     dates = pd.date_range(start = '2024-01-01', periods=num_records, freq = 'D')
@@ -103,17 +112,20 @@ def process_start_end_bal (start_balance, input_file = "finance_data.csv", outpu
 
     print(output_df.to_string(index=False))
 
-def create_db():
 
-    finance_db = mysql.connector.connect(
-    host = "localhost",
-    user = "yourusername",
-    password = "yourpassword"
-    )
 
-    mycursor = finance_db.cursor()
+def add_data_to_db(input_file = "finance_data.csv"):
+    df = pd.read_csv(input_file)
 
-    mycursor.execute("CREATE DATABASE finance_db")      
+    for index, row in df.iterrows():
+        sql = "INSERT INTO transactions (date, type, amount) VALUES (%s, %s, %s)"
+        val = (row['date'], row['type'], row['amount'])
+        mycursor.execute(sql, val)
+        finance_db.commit()
+
+    print("Data imported to databse")
+             
+
 
 if __name__ == "__main__":
     
@@ -125,15 +137,4 @@ if __name__ == "__main__":
 
     #process_start_end_bal(0)
 
-    #create_db()
-
-    print(os.getenv("dbusername"))
-
-
-
-
-
-
-
-
-
+    add_data_to_db()
