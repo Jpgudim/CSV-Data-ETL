@@ -7,6 +7,12 @@ Note: This project was originally designed from a Claude prompt.
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import mysql.connector
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def create_sample_data(filename = 'finance_data.csv', num_records = 1000):
 
@@ -96,17 +102,32 @@ def process_start_end_bal (start_balance, input_file = "finance_data.csv", outpu
     print("Processed data saved to", output_file)
 
     print(output_df.to_string(index=False))
-        
+
+def create_db():
+
+    finance_db = mysql.connector.connect(
+    host = "localhost",
+    user = "yourusername",
+    password = "yourpassword"
+    )
+
+    mycursor = finance_db.cursor()
+
+    mycursor.execute("CREATE DATABASE finance_db")      
 
 if __name__ == "__main__":
     
-    create_sample_data()
+    #create_sample_data()
 
-    process_monthly_totals()
+    #process_monthly_totals()
 
-    process_average_by_transaction_type()
+    #process_average_by_transaction_type()
 
-    process_start_end_bal(0)
+    #process_start_end_bal(0)
+
+    #create_db()
+
+    print(os.getenv("dbusername"))
 
 
 
