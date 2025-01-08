@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import mysql.connector
+import csv
 
 import os
 from dotenv import load_dotenv
@@ -124,17 +125,33 @@ def add_data_to_db(input_file = "finance_data.csv"):
         finance_db.commit()
 
     print("Data imported to databse")
-             
+
+
+
+def add_new_data(input_file = "finance_data.csv", output_file = "finance_data.csv"):
+    enter_date = input("Enter the date of the transaction (yyyy-mm-dd):")
+    enter_type = input("Enter the type of transaction (Deposit, Withdrawal, Purchase, Interest):")
+    enter_amount = input("Enter the amount of the transaction:")
+
+    output_transaction = (enter_date, enter_type, enter_amount)
+    output_df = pd.DataFrame([output_transaction])
+    output_df.to_csv(output_file, mode='a', index=False, header=False)
+    print("Transaction recorded to CSV")
+
+    sql = "INSERT INTO transactions (date, type, amount) VALUES (%s, %s, %s)"
+    val = (enter_date, enter_type, enter_amount)
+    mycursor.execute(sql, val)
+    finance_db.commit()
+    print("Transaction recorded to database")
+
+
 
 
 if __name__ == "__main__":
     
-    #create_sample_data()
-
-    #process_monthly_totals()
-
-    #process_average_by_transaction_type()
-
-    #process_start_end_bal(0)
-
+    create_sample_data()
+    process_monthly_totals()
+    process_average_by_transaction_type()
+    process_start_end_bal(0)
     add_data_to_db()
+    add_new_data()
